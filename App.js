@@ -14,6 +14,7 @@ export default function App() {
   const [observation,setObservation] =useState("")
   const [looking,setLooking] =useState()
   const [loading,setLoadings] =useState(false)
+  const [error,setError] =useState(false)
 
   const intial  = {
     save:[]
@@ -24,22 +25,32 @@ export default function App() {
   // Referencias a elementos
   const resultNote =  note * 0.30 + noteone * 0.35 + notetwo * 0.35
 
-  useLayoutEffect(() =>{
-    setDefinitive(resultNote)
-  if(resultNote >3){
-    setObservation("Aprueba")
-  }else if(resultNote > 2 || setObservation< 2.94){
-    setObservation("Habilita")
-  }else if(resultNote <2){
-    setObservation("Reprueba")
-  }
 
-  },[notetwo])
+
+  useLayoutEffect(() =>{    
+  if(note >5 || note <0){
+    alert("la nota no puede ser mayor que  0 o mayor que 5")
+    setNote()
+  }else if(noteone >5 || noteone <0){
+    setNoteone()
+    alert("la nota no puede ser mayor que  0 o mayor que 5")
+  }else if(notetwo >5 || notetwo<0) {
+    setNotetwo()
+    alert("la nota no puede ser mayor que  0 o mayor que 5")
+  }else {
+    if(resultNote >3){
+      setObservation("Aprueba")
+    }else if(resultNote > 2 || setObservation< 2.94){
+      setObservation("Habilita")
+    }else if(resultNote <2){
+      setObservation("Reprueba")
+    }
+    setDefinitive(resultNote)
+  } 
+  },[notetwo,noteone,note])
 
   const guardar = () => {
     //Agregar datos al array a través del  setSalarios para el array salarios
-    
-    //console.log(salarios);
     const e ={
               identification:identification,
               name:name,
@@ -54,20 +65,21 @@ export default function App() {
     if(identification &&name && asignature&& note && notetwo &&definitive &&observation){
       setState({...state,
         save:[...state.save,e]})
-    } 
+    }else{
+      setError(true)
+    }
   }
   
   const limpiar =()=>{
-    setIdentification("")
-    setName("")
-    setAsignature("")
-    setNote("")
-    setNoteone("")
-    setNotetwo("")
-    setDefinitive("")
-    setObservation("")
+    setIdentification(null)
+    setName(null)
+    setAsignature(null)
+    setNote()
+    setNoteone()
+    setNotetwo()
+    setDefinitive(null)
+    setObservation(null)
   }
-
 
   let buscar = () =>{
     let nomenc = state?.save?.find(iden => iden.identification == identification);
@@ -81,6 +93,10 @@ export default function App() {
     }
   }
 
+
+  const hanback =() =>{
+    setLoadings(false)
+  }
   
 console.log(state)
 
@@ -95,6 +111,8 @@ console.log(state)
 
       <View style={styles.container}>
       <StatusBar />
+
+      {!loading && <View>
       <View style={{display:"flex",flexDirection:"row",justifyContent:"center"}} >
           <View style={{display:"flex",justifyContent:"flex-end",width:"50%"}}  >
             <Text>Identificacion</Text>
@@ -103,13 +121,12 @@ console.log(state)
             <TextInput    
                 onChangeText={setIdentification}
                 value={identification}
-                
                 keyboardType="numeric"
                 style={{borderBottomWidth:1,color:"gray",width:100}}
               />
           </View>
       </View>
-
+     
       <View style={{display:"flex",flexDirection:"row",justifyContent:"center",marginTop:20}} >
           <View style={{display:"flex",justifyContent:"flex-end",width:"50%"}}  >
             <Text>Nombre</Text>
@@ -200,7 +217,7 @@ console.log(state)
             <Text>{observation ? observation : null}</Text>
           </View>
       </View>
-
+       {error && <Text style={{color:"red",marginTop:10,marginLeft:28}} >Completa todos los formularios </Text>}
       <View style={{display:"flex",justifyContent:"flex-start",flexDirection:"row",marginTop:10}} >
             <TouchableOpacity
               onPress={guardar}
@@ -223,8 +240,9 @@ console.log(state)
       <View>
       </View>
 
+      </View> }
       
-    {loading ? <View>
+    {loading && <View>
       <View style={{display:"flex",flexDirection:"row",justifyContent:"center",marginTop:20}} >
           <View style={{display:"flex",justifyContent:"flex-end",width:"50%"}}  >
             <Text>Identificacion</Text>
@@ -297,7 +315,15 @@ console.log(state)
           </View>
       </View>
 
-      </View> :null }
+      <View style={{display:"flex",justifyContent:"flex-start",flexDirection:"row",marginTop:10}} >
+            <TouchableOpacity
+              onPress={hanback}
+              style={{backgroundColor:'green',width:160,margin:3}}>
+                <Text style={{color:'white', padding:5,textAlign:"center"}}>Volver A buscar</Text>
+            </TouchableOpacity>
+      </View>
+
+      </View> }
     </View>
     </KeyboardAwareScrollView>
   );
